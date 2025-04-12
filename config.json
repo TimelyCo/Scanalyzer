@@ -1,0 +1,18 @@
+{
+    "severity_levels": {
+        "high": true,
+        "medium": true,
+        "low": false
+    },
+    "rules": {
+        "security": true,
+        "performance": true,
+        "style": false
+    },
+    "ignore_patterns": [
+        "**/venv/**",
+        "**/__pycache__/**",
+        "**/node_modules/**",
+        "**/tests/**"
+    ]
+}
