@@ -1,0 +1,49 @@
+
+    <!DOCTYPE html>
+    <html lang="en">
+    <head>
+        <meta charset="UTF-8">
+        <meta name="viewport" content="width=device-width, initial-scale=1.0">
+        <title>Scanalyzer Report</title>
+        <style>
+            body { font-family: Arial, sans-serif; margin: 20px; }
+            h1 { color: #333; }
+            .summary { margin-bottom: 20px; }
+            .file { margin-bottom: 30px; border: 1px solid #ddd; padding: 10px; border-radius: 5px; }
+            .file-header { background: #f5f5f5; padding: 10px; margin: -10px -10px 10px; border-radius: 5px 5px 0 0; }
+            .issue { margin-bottom: 15px; padding-bottom: 15px; border-bottom: 1px solid #eee; }
+            .high { color: #d9534f; }
+            .medium { color: #f0ad4e; }
+            .low { color: #5cb85c; }
+            .timestamp { color: #777; font-size: 0.9em; }
+        </style>
+    </head>
+    <body>
+        <h1>Scanalyzer Report</h1>
+        <div class="timestamp">Generated on 2025-05-16 23:20:57</div>
+        
+        <div class="summary">
+            <h2>Summary</h2>
+            <p>Total issues found: 4</p>
+        </div>
+    
+        <div class="file">
+            <div class="file-header">
+                <h3>File: sample_code\example.py</h3>
+            </div>
+        
+            <div class="issue">
+                <p><span class="high">[HIGH]</span> Line 12: Potentially unsafe eval() function</p>
+            <p>Rule: unsafe_eval</p></div>
+            <div class="issue">
+                <p><span class="high">[HIGH]</span> Line 25: Command injection risk with os.system()</p>
+            <p>Rule: unsafe_os.system</p></div>
+            <div class="issue">
+                <p><span class="medium">[MEDIUM]</span> Line 33: Expensive operation copy() called inside a loop</p>
+            <p>Rule: expensive_operation_in_loop</p></div>
+            <div class="issue">
+                <p><span class="high">[HIGH]</span> Line 45: Deserialization vulnerability with pickle</p>
+            <p>Rule: unsafe_pickle.load</p></div></div>
+    </body>
+    </html>
+    

@@ -1,3 +1,5 @@
+from analyzers.java_analyzer import JavaAnalyzer
+
 #!/usr/bin/env python
 """
 Scanalyzer: Static Code Analyzer
@@ -52,12 +54,13 @@ def analyze_file(file_path, language, rules, config):
         print(f"C++ analysis not implemented yet for {file_path}")
         return []
     elif language == "java":
-        # Future implementation
-        print(f"Java analysis not implemented yet for {file_path}")
-        return []
+        analyzer = JavaAnalyzer(rules, config)
+        return analyzer.analyze(file_path)
     else:
         print(f"Unsupported language for {file_path}")
         return []
+    issues = analyzer.analyze(file_path)
+  
 
 def analyze_directory(directory_path, language, rules, config):
     """Recursively analyze all files in a directory"""

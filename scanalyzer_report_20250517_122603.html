@@ -1,0 +1,46 @@
+
+    <!DOCTYPE html>
+    <html lang="en">
+    <head>
+        <meta charset="UTF-8">
+        <meta name="viewport" content="width=device-width, initial-scale=1.0">
+        <title>Scanalyzer Report</title>
+        <style>
+            body { font-family: Arial, sans-serif; margin: 20px; }
+            h1 { color: #333; }
+            .summary { margin-bottom: 20px; }
+            .file { margin-bottom: 30px; border: 1px solid #ddd; padding: 10px; border-radius: 5px; }
+            .file-header { background: #f5f5f5; padding: 10px; margin: -10px -10px 10px; border-radius: 5px 5px 0 0; }
+            .issue { margin-bottom: 15px; padding-bottom: 15px; border-bottom: 1px solid #eee; }
+            .high { color: #d9534f; }
+            .medium { color: #f0ad4e; }
+            .low { color: #5cb85c; }
+            .timestamp { color: #777; font-size: 0.9em; }
+        </style>
+    </head>
+    <body>
+        <h1>Scanalyzer Report</h1>
+        <div class="timestamp">Generated on 2025-05-17 12:26:03</div>
+        
+        <div class="summary">
+            <h2>Summary</h2>
+            <p>Total issues found: 3</p>
+        </div>
+    
+        <div class="file">
+            <div class="file-header">
+                <h3>File: sample_code\anotherexample.java</h3>
+            </div>
+        
+            <div class="issue">
+                <p><span class="high">[HIGH]</span> Line 1: [WinError 2] The system cannot find the file specified</p>
+            <p>Rule: javac_error</p></div>
+            <div class="issue">
+                <p><span class="high">[HIGH]</span> Line 1: [WinError 2] The system cannot find the file specified</p>
+            <p>Rule: checkstyle_error</p></div>
+            <div class="issue">
+                <p><span class="high">[HIGH]</span> Line 41: Use of Runtime.exec() may lead to command injection</p>
+            <p>Rule: dangerous_exec</p></div></div>
+    </body>
+    </html>
+    
