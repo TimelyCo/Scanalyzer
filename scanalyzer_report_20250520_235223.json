@@ -1,0 +1,78 @@
+{
+  "metadata": {
+    "timestamp": "2025-05-20T23:52:23.985646",
+    "tool_version": "1.0.0",
+    "analysis_duration": 0,
+    "total_files_analyzed": 1,
+    "total_issues": 3
+  },
+  "summary": {
+    "severity_distribution": {
+      "high": 3,
+      "medium": 0,
+      "low": 0
+    },
+    "issue_types": {
+      "security": 3,
+      "performance": 0,
+      "style": 0,
+      "error": 0
+    }
+  },
+  "files": {
+    "sample_code/example.py": {
+      "total_issues": 3,
+      "severity_distribution": {
+        "high": 3,
+        "medium": 0,
+        "low": 0
+      },
+      "issues": [
+        {
+          "type": "security",
+          "rule": "unsafe_eval",
+          "message": "Potentially unsafe eval() function",
+          "line": 12,
+          "column": 11,
+          "severity": "high",
+          "file": "sample_code/example.py"
+        },
+        {
+          "type": "security",
+          "rule": "unsafe_os.system",
+          "message": "Command injection risk with os.system()",
+          "line": 25,
+          "column": 11,
+          "severity": "high",
+          "file": "sample_code/example.py"
+        },
+        {
+          "type": "security",
+          "rule": "unsafe_pickle.load",
+          "message": "Deserialization vulnerability with pickle",
+          "line": 45,
+          "column": 15,
+          "severity": "high",
+          "file": "sample_code/example.py"
+        }
+      ]
+    }
+  },
+  "recommendations": {
+    "high_priority": [
+      "Fix all high severity issues first",
+      "Address security vulnerabilities immediately",
+      "Review and fix critical performance issues"
+    ],
+    "medium_priority": [
+      "Address medium severity issues",
+      "Improve code quality and maintainability",
+      "Optimize performance bottlenecks"
+    ],
+    "low_priority": [
+      "Fix style and convention issues",
+      "Improve code documentation",
+      "Enhance code readability"
+    ]
+  }
+}
