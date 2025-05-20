@@ -13,6 +13,7 @@ from utils.config import load_config
 from analyzers.python_analyzer import PythonAnalyzer
 from analyzers.java_analyzer import JavaAnalyzer
 from analyzers.js_analyzer import JavaScriptAnalyzer
+from analyzers.regex_analyzer import RegexAnalyzer
 from reports.report_generator import generate_report
 
 
@@ -28,6 +29,8 @@ def parse_arguments():
                         help="Rules to check (all, security, performance, style)")
     parser.add_argument("--config", "-c", 
                         help="Path to configuration file")
+    parser.add_argument("--use-regex", action="store_true",
+                        help="Enable regex-based analysis")
     return parser.parse_args()
 
 
@@ -47,29 +50,38 @@ def detect_language(file_path):
         return "unknown"
 
 
-def analyze_file(file_path, language, rules, config):
+def analyze_file(file_path, language, rules, config, use_regex=False):
     """Analyze a single file"""
+    all_issues = []
+    
     if language == "auto":
         language = detect_language(file_path)
     
+    # Run language-specific analyzer
     if language == "python":
         analyzer = PythonAnalyzer(rules, config)
-        return analyzer.analyze(file_path)
+        all_issues.extend(analyzer.analyze(file_path))
     elif language == "java":
         analyzer = JavaAnalyzer(rules, config)
-        return analyzer.analyze(file_path)
+        all_issues.extend(analyzer.analyze(file_path))
     elif language == "javascript":
         analyzer = JavaScriptAnalyzer(rules, config)
-        return analyzer.analyze(file_path)
+        all_issues.extend(analyzer.analyze(file_path))
     elif language == "c++":
         print(f"C++ analysis not implemented yet for {file_path}")
-        return []
     else:
         print(f"Unsupported language for {file_path}")
-        return []
+    
+    # Run regex analyzer if enabled
+    if use_regex:
+        regex_analyzer = RegexAnalyzer(rules, config)
+        regex_issues = regex_analyzer.analyze_file(file_path)
+        all_issues.extend(regex_issues)
+    
+    return all_issues
 
 
-def analyze_directory(directory_path, language, rules, config):
+def analyze_directory(directory_path, language, rules, config, use_regex=False):
     """Recursively analyze all files in a directory"""
     all_issues = []
     
@@ -84,7 +96,7 @@ def analyze_directory(directory_path, language, rules, config):
             if language != "auto" and file_language != language:
                 continue
                 
-            file_issues = analyze_file(file_path, file_language, rules, config)
+            file_issues = analyze_file(file_path, file_language, rules, config, use_regex)
             all_issues.extend(file_issues)
     
     return all_issues
@@ -100,9 +112,9 @@ def main():
     
     # Analyze file or directory
     if os.path.isfile(args.path):
-        issues = analyze_file(args.path, args.language, args.rules, config)
+        issues = analyze_file(args.path, args.language, args.rules, config, args.use_regex)
     elif os.path.isdir(args.path):
-        issues = analyze_directory(args.path, args.language, args.rules, config)
+        issues = analyze_directory(args.path, args.language, args.rules, config, args.use_regex)
     else:
         print(f"Error: {args.path} is not a valid file or directory")
         sys.exit(1)
