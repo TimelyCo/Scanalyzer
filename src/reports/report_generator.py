@@ -130,16 +130,78 @@ def generate_html_report(issues):
     print(f"HTML report generated: {os.path.abspath(output_file)}")
 
 def generate_json_report(issues):
-    """Generate a JSON report"""
+    """Generate a detailed JSON report"""
     timestamp = datetime.now().strftime("%Y%m%d_%H%M%S")
     output_file = f"scanalyzer_report_{timestamp}.json"
     
+    # Group issues by file and severity
+    issues_by_file = {}
+    severity_counts = {'high': 0, 'medium': 0, 'low': 0}
+    
+    for issue in issues:
+        file_path = issue.get('file', 'unknown')
+        severity = issue.get('severity', 'low')
+        
+        # Update severity counts
+        severity_counts[severity] += 1
+        
+        if file_path not in issues_by_file:
+            issues_by_file[file_path] = {
+                'total_issues': 0,
+                'severity_counts': {'high': 0, 'medium': 0, 'low': 0},
+                'issues': []
+            }
+        
+        issues_by_file[file_path]['total_issues'] += 1
+        issues_by_file[file_path]['severity_counts'][severity] += 1
+        issues_by_file[file_path]['issues'].append(issue)
+    
+    # Create the report structure
     report = {
-        "timestamp": datetime.now().isoformat(),
-        "total_issues": len(issues),
-        "issues": issues
+        "metadata": {
+            "timestamp": datetime.now().isoformat(),
+            "tool_version": "1.0.0",
+            "analysis_duration": 0,  # This should be set by the main program
+            "total_files_analyzed": len(issues_by_file),
+            "total_issues": len(issues)
+        },
+        "summary": {
+            "severity_distribution": severity_counts,
+            "issue_types": {
+                "security": sum(1 for i in issues if i.get('type') == 'security'),
+                "performance": sum(1 for i in issues if i.get('type') == 'performance'),
+                "style": sum(1 for i in issues if i.get('type') == 'style'),
+                "error": sum(1 for i in issues if i.get('type') == 'error')
+            }
+        },
+        "files": {
+            file_path: {
+                "total_issues": data['total_issues'],
+                "severity_distribution": data['severity_counts'],
+                "issues": sorted(data['issues'], key=lambda x: x.get('line', 0))
+            }
+            for file_path, data in issues_by_file.items()
+        },
+        "recommendations": {
+            "high_priority": [
+                "Fix all high severity issues first",
+                "Address security vulnerabilities immediately",
+                "Review and fix critical performance issues"
+            ],
+            "medium_priority": [
+                "Address medium severity issues",
+                "Improve code quality and maintainability",
+                "Optimize performance bottlenecks"
+            ],
+            "low_priority": [
+                "Fix style and convention issues",
+                "Improve code documentation",
+                "Enhance code readability"
+            ]
+        }
     }
     
+    # Write the report to file
     with open(output_file, 'w', encoding='utf-8') as f:
         json.dump(report, f, indent=2)
     

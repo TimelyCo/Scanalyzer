@@ -1,0 +1,43 @@
+name: Python CI/CD
+
+on:
+  push:
+    branches: [ main ]
+  pull_request:
+    branches: [ main ]
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+
+    steps:
+    - uses: actions/checkout@v3
+    
+    - name: Set up Python
+      uses: actions/setup-python@v4
+      with:
+        python-version: '3.9'
+        
+    - name: Install dependencies
+      run: |
+        python -m pip install --upgrade pip
+        if [ -f requirements.txt ]; then pip install -r requirements.txt; fi
+        pip install pytest pylint pytest-cov
+        
+    - name: Run tests
+      run: |
+        pytest --cov=./ --cov-report=xml
+        
+    - name: Run Pylint
+      run: |
+        pylint src/ || true
+        
+    - name: Run code analyzer
+      run: |
+        python -c "from src.analyzers.python_analyzer import PythonAnalyzer; analyzer = PythonAnalyzer(); issues = analyzer.analyze('src/analyzers/python_analyzer.py'); print('Analysis complete:', len(issues), 'issues found')"
+        
+    - name: Upload coverage to Codecov
+      uses: codecov/codecov-action@v3
+      with:
+        file: ./coverage.xml
+        fail_ci_if_error: true 
