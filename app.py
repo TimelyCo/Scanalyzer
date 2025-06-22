@@ -1,71 +1,53 @@
 from flask import Flask, render_template_string, request, abort
 import os
+import sys
+sys.path.insert(0, os.path.join(os.path.dirname(__file__), "src"))
+from scanalyzer import analyze_file as real_analyze_file, detect_language
+from utils.config import load_config
 
 app = Flask(__name__)
 PROJECT_DIR = 'sample_code'  # Your code directory
 
 # Function to run analysis based on file extension
 def analyze_file(filepath):
-    ext = os.path.splitext(filepath)[1].lower()
+    print(f"DEBUG: Received filename from frontend: {filepath}")
     full_path = os.path.join(PROJECT_DIR, filepath)
+    print(f"DEBUG: Full path to analyze: {full_path}")
     if not os.path.exists(full_path):
+        print("DEBUG: File not found.")
         return "File not found.", []
 
-    if ext == '.js':
-        output = (
-            f"Analyzing {filepath} with JavaScript analyzer...\n"
-            "[LOW] Line 1: Variable 'x' declared but not used\n"
-            "  Rule: unused_variable\n\n"
-            "[HIGH] Line 8: Use of eval()\n"
-            "  Rule: unsafe_eval\n"
-        )
-        issues = [
-            {"severity": "LOW", "line": 1, "message": "Variable 'x' declared but not used", "rule": "unused_variable"},
-            {"severity": "HIGH", "line": 8, "message": "Use of eval()", "rule": "unsafe_eval"},
-        ]
-        return output, issues
+    # Detect language
+    language = detect_language(full_path)
+    print(f"DEBUG: Detected language: {language}")
+    config = load_config(None)
+    rules = "all"  # or "security", or get from user input
 
-    elif ext == '.py':
-        output = (
-            f"Analyzing {filepath} with Python analyzer...\n"
-            "[HIGH] Line 12: Potentially unsafe eval() function\n"
-            "  Rule: unsafe_eval\n"
-            "[HIGH] Line 25: Command injection risk with os.system()\n"
-            "  Rule: unsafe_os.system\n"
-        )
-        issues = [
-            {"severity": "HIGH", "line": 12, "message": "Potentially unsafe eval() function", "rule": "unsafe_eval"},
-            {"severity": "HIGH", "line": 25, "message": "Command injection risk with os.system()", "rule": "unsafe_os.system"},
-        ]
-        return output, issues
+    # Run the real analyzer
+    issues = real_analyze_file(full_path, language, rules, config, use_regex=False)
+    print(f"DEBUG: Raw issues from analyzer: {issues}")
 
-    elif ext == '.java':
-        output = (
-            f"Analyzing {filepath} with Java analyzer...\n"
-            "[HIGH] Line 1: [WinError 2] The system cannot find the file specified\n"
-            "  Rule: javac_error\n\n"
-            "[HIGH] Line 1: [WinError 2] The system cannot find the file specified\n"
-            "  Rule: checkstyle_error\n\n"
-            "[HIGH] Line 41: Use of Runtime.exec() may lead to command injection\n"
-            "  Rule: dangerous_exec\n"
-        )
-        issues = [
-            {"severity": "HIGH", "line": 1, "message": "[WinError 2] The system cannot find the file specified", "rule": "javac_error"},
-            {"severity": "HIGH", "line": 1, "message": "[WinError 2] The system cannot find the file specified", "rule": "checkstyle_error"},
-            {"severity": "HIGH", "line": 41, "message": "Use of Runtime.exec() may lead to command injection", "rule": "dangerous_exec"},
-        ]
-        return output, issues
+    # Format output for display
+    output_lines = [f"Analyzing {filepath} with {language.capitalize()} analyzer..."]
+    formatted_issues = []
+    for issue in issues:
+        sev = issue.get("severity", "LOW").upper()
+        line = issue.get("line", "?")
+        msg = issue.get("message", "")
+        rule = issue.get("rule", "")
+        output_lines.append(f"[{sev}] Line {line}: {msg}\n  Rule: {rule}\n")
+        # Ensure the frontend gets the right format
+        formatted_issues.append({
+            "severity": sev,
+            "line": line,
+            "message": msg,
+            "rule": rule
+        })
 
-    elif ext == '.cpp':
-        output = (
-            f"Analyzing {filepath} with C++ analyzer...\n"
-            "No issues found!\n"
-        )
-        issues = []
-        return output, issues
-
-    else:
-        return "Analysis not implemented for this file type.", []
+    output = "\n".join(output_lines)
+    print(f"DEBUG: Output sent to frontend: {output}")
+    print(f"DEBUG: Formatted issues sent to frontend: {formatted_issues}")
+    return output, formatted_issues
 
 @app.route('/')
 def index():
@@ -84,8 +66,18 @@ def index():
 @app.route('/analyze', methods=['POST'])
 def analyze():
     filename = request.json.get('filename')
+    print(f"DEBUG: /analyze called with filename: {filename}")
     output, issues = analyze_file(filename)
+    print(f"DEBUG: /analyze returning output: {output}")
+    print(f"DEBUG: /analyze returning issues: {issues}")
     return {'output': output, 'issues': issues}
+
+@app.route('/test_issue')
+def test_issue():
+    # For frontend testing: always returns a test issue
+    return {'output': 'Test', 'issues': [
+        {"severity": "HIGH", "line": 1, "message": "Test issue", "rule": "test_rule"}
+    ]}
 
 @app.route('/view/<path:filename>')
 def view_file(filename):
