@@ -36,6 +36,9 @@ class JavaScriptAnalyzer:
                 'file': file_path
             }]
 
+        # Add CFG-based issues
+        issues.extend(self._check_cfg_issues(file_path))
+
         unused_vars = set()
         used_vars = set()
 
@@ -98,3 +101,54 @@ class JavaScriptAnalyzer:
             return "low"
         else:
             return "medium"
+
+    def _check_cfg_issues(self, file_path):
+        """Simple CFG-based checks for JavaScript code"""
+        issues = []
+        try:
+            with open(file_path, 'r', encoding='utf-8') as file:
+                lines = file.readlines()
+                for idx, line in enumerate(lines, 1):
+                    # Unreachable code: code after return
+                    if 'return' in line:
+                        if idx < len(lines):
+                            next_line = lines[idx].strip()
+                            if next_line and not next_line.startswith('//'):
+                                issues.append({
+                                    'type': 'cfg',
+                                    'rule': 'unreachable',
+                                    'message': 'Code after return is unreachable',
+                                    'line': idx + 1,
+                                    'column': 1,
+                                    'severity': 'medium',
+                                    'file': file_path
+                                })
+                    # Infinite loop: while(true)
+                    if 'while(true)' in line.replace(' ', ''):
+                        issues.append({
+                            'type': 'cfg',
+                            'rule': 'infinite_loops',
+                            'message': 'Potential infinite loop detected',
+                            'line': idx,
+                            'column': 1,
+                            'severity': 'medium',
+                            'file': file_path
+                        })
+                    # Exception path: try/catch
+                    if 'try' in line:
+                        # Look ahead for catch
+                        for j in range(idx, min(idx+10, len(lines))):
+                            if 'catch' in lines[j]:
+                                issues.append({
+                                    'type': 'cfg',
+                                    'rule': 'exception_paths',
+                                    'message': 'Exception handling path (try/catch) detected',
+                                    'line': idx,
+                                    'column': 1,
+                                    'severity': 'medium',
+                                    'file': file_path
+                                })
+                                break
+        except Exception as e:
+            pass
+        return issues

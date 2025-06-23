@@ -134,6 +134,29 @@ public class SecurityOptimizedApplication {
         return flattened;
     }
     
+    // CFG issue: Unreachable code
+    public static String unreachableCode() {
+        return "Done";
+        System.out.println("This will never be shown"); // Unreachable
+    }
+
+    // CFG issue: Infinite loop
+    public static void infiniteLoop() {
+        while (true) {
+            // Infinite loop
+        }
+    }
+
+    // CFG issue: Exception handling path
+    public static void exceptionHandling() {
+        try {
+            int x = 1 / 0;
+        } catch (ArithmeticException e) {
+            System.out.println("Caught division by zero!");
+        }
+        System.out.println("After exception handling");
+    }
+    
     public static void main(String[] args) {
         Scanner scanner = new Scanner(System.in);
         
@@ -182,6 +205,13 @@ public class SecurityOptimizedApplication {
             int[][] matrix = createMatrix(10);
             List<Integer> flattened = flattenMatrix(matrix);
             System.out.println("Flattened matrix size: " + flattened.size());
+            
+            // CFG: Unreachable code
+            unreachableCode();
+            // CFG: Infinite loop (commented out to avoid hanging)
+            // infiniteLoop();
+            // CFG: Exception handling
+            exceptionHandling();
             
         } catch (Exception e) {
             System.err.println("An unexpected error occurred: " + e.getMessage());

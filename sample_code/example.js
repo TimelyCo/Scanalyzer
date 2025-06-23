@@ -74,6 +74,29 @@ function nestedComprehension() {
     return nested;
 }
 
+// CFG issue: Unreachable code
+function cfgUnreachableCode() {
+    return "Done";
+    console.log("This will never be shown"); // Unreachable
+}
+
+// CFG issue: Infinite loop
+function cfgInfiniteLoop() {
+    while (true) {
+        // Infinite loop
+    }
+}
+
+// CFG issue: Exception handling path
+function cfgExceptionHandling() {
+    try {
+        let x = 1 / 0;
+    } catch (e) {
+        console.log("Caught division by zero!");
+    }
+    console.log("After exception handling");
+}
+
 // Main function with many issues
 function main() {
     const readline = require("readline").createInterface({
@@ -96,6 +119,13 @@ function main() {
             console.log("Processed data:", processed);
 
             unreachableCode();
+
+            // CFG: Unreachable code
+            cfgUnreachableCode();
+            // CFG: Infinite loop (commented out to avoid hanging)
+            // cfgInfiniteLoop();
+            // CFG: Exception handling
+            cfgExceptionHandling();
 
             readline.close();
         });

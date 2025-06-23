@@ -178,6 +178,29 @@ unsigned int integer_overflow() {
     return max + 1;  // Will overflow
 }
 
+// CFG issue: Unreachable code
+std::string cfg_unreachable_code() {
+    return "Done";
+    std::cout << "This will never be shown" << std::endl; // Unreachable
+}
+
+// CFG issue: Infinite loop
+void cfg_infinite_loop() {
+    while (true) {
+        // Infinite loop
+    }
+}
+
+// CFG issue: Exception handling path
+void cfg_exception_handling() {
+    try {
+        int x = 1 / 0;
+    } catch (const std::exception& e) {
+        std::cout << "Caught exception: " << e.what() << std::endl;
+    }
+    std::cout << "After exception handling" << std::endl;
+}
+
 // Main function with multiple issues
 int main() {
     /**
@@ -218,6 +241,13 @@ int main() {
     
     // Out of bounds access
     out_of_bounds_access();
+    
+    // CFG: Unreachable code
+    cfg_unreachable_code();
+    // CFG: Infinite loop (commented out to avoid hanging)
+    // cfg_infinite_loop();
+    // CFG: Exception handling
+    cfg_exception_handling();
     
     return 0;
 }
