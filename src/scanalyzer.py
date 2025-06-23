@@ -197,11 +197,11 @@ def main():
     # --- Email notification config (fill in your details) ---
     email_config = {
         'to_email': 'anmolraturi246@gmail.com',
-        'from_email': 'anmolraturi444@outlook.com',
+        'from_email': 'bhattabhay158@gmail.com',
         'smtp_server': 'smtp.gmail.com',
         'smtp_port': 465,
-        'smtp_user': 'anmolraturi444@outlook.com',
-        'smtp_pass': 'Anmol123)(*',
+        'smtp_user': 'bhattabhay158@gmail.com',
+        'smtp_pass': '@bh@y bh@tt',
     }
     notify_if_issues_email(issues, email_config)
     
