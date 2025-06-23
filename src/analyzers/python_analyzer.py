@@ -8,6 +8,8 @@ import astroid
 from pylint import lint
 from pylint.reporters.text import TextReporter
 import io
+from .cfg_builder import CFGBuilder
+from .cfg_analyzer import CFGAnalyzer
 
 class PythonAnalyzer:
     """Analyzer for Python source code"""
@@ -254,6 +256,25 @@ class PythonAnalyzer:
         
         # Parse the AST
         ast_tree = self._parse_ast(file_path)
+        
+        # CFG Analysis (only if AST is valid)
+        if not isinstance(ast_tree, list):
+            cfg_builder = CFGBuilder()
+            cfg = cfg_builder.build_cfg(ast_tree)
+            cfg_analyzer = CFGAnalyzer()
+            cfg_findings = cfg_analyzer.analyze(cfg)
+            for rule, nodes in cfg_findings.items():
+                for node in nodes:
+                    lineno = getattr(node.ast_node, 'lineno', 1)
+                    issues.append({
+                        'type': 'cfg',
+                        'rule': rule,
+                        'message': f'CFG {rule.replace("_", " ")}: Node {getattr(node, "name", str(node))}',
+                        'line': lineno,
+                        'column': getattr(node.ast_node, 'col_offset', 0),
+                        'severity': 'medium',
+                        'file': file_path
+                    })
         
         # Run different checks based on rules
         if self.rules in ["all", "security"]:

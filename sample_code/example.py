@@ -57,6 +57,21 @@ def unreachable_code():
     return "Result"
     print("This will never be executed")  # Unreachable code
 
+# CFG issue: Infinite loop with no exit
+def infinite_loop():
+    """Function with an infinite loop"""
+    while True:
+        pass  # No break or return
+
+# CFG issue: Exception handling path
+def exception_handling():
+    """Function with try/except block"""
+    try:
+        x = 1 / 0  # Will raise ZeroDivisionError
+    except ZeroDivisionError:
+        print("Caught division by zero!")
+    print("After exception handling")
+
 # Nested list comprehension (potential performance issue)
 def nested_comprehension():
     """Function with nested list comprehension"""
@@ -92,6 +107,12 @@ def main():
     
     # Unreachable due to previous security issues likely causing problems
     unreachable_code()
+    
+    # CFG: Infinite loop (commented out to avoid hanging the script)
+    # infinite_loop()
+    
+    # CFG: Exception handling
+    exception_handling()
 
 if __name__ == "__main__":
     main()

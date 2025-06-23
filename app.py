@@ -108,7 +108,7 @@ def analyze_file(filepath):
             'HIGH': len([i for i in issues if i['severity'] == 'HIGH']),
             'MEDIUM': len([i for i in issues if i['severity'] == 'MEDIUM']),
             'LOW': len([i for i in issues if i['severity'] == 'LOW'])
-        }
+        } 
     }
     analysis_history.append(analysis_entry)
     
